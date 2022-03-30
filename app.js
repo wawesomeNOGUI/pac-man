@@ -76,55 +76,98 @@ document.addEventListener('DOMContentLoaded', () => {
   // console.log(getCoordinates(pacmanCurrentIndex))
 
   //move pacman
-  function movePacman(e) {
+  var pacManDirection = "";  //can be "left", "right", "up", "down"
+  function movePacman() {
     squares[pacmanCurrentIndex].classList.remove('pac-man')
-    switch(e.keyCode) {
-      case 37:
-        if(
-          pacmanCurrentIndex % width !== 0 &&
-          !squares[pacmanCurrentIndex -1].classList.contains('wall') &&
-          !squares[pacmanCurrentIndex -1].classList.contains('ghost-lair')
-          )
-        pacmanCurrentIndex -= 1
+
+      if(pacManDirection == "left") {
+        if(pacmanCurrentIndex % width !== 0 &&
+           !squares[pacmanCurrentIndex -1].classList.contains('wall') &&
+            !squares[pacmanCurrentIndex -1].classList.contains('ghost-lair')
+        )
+          pacmanCurrentIndex -= 1
         if (squares[pacmanCurrentIndex -1] === squares[363]) {
           pacmanCurrentIndex = 391
         }
-        break
-      case 38:
-        if(
-          pacmanCurrentIndex - width >= 0 &&
-          !squares[pacmanCurrentIndex -width].classList.contains('wall') &&
-          !squares[pacmanCurrentIndex -width].classList.contains('ghost-lair')
-          ) 
-        pacmanCurrentIndex -= width
-        break
-      case 39:
+      } else if(pacManDirection == "right") {
         if(
           pacmanCurrentIndex % width < width - 1 &&
           !squares[pacmanCurrentIndex +1].classList.contains('wall') &&
           !squares[pacmanCurrentIndex +1].classList.contains('ghost-lair')
         )
-        pacmanCurrentIndex += 1
+          pacmanCurrentIndex += 1
         if (squares[pacmanCurrentIndex +1] === squares[392]) {
           pacmanCurrentIndex = 364
         }
-        break
-      case 40:
+      } else if(pacManDirection == "up") {
+        if(
+          pacmanCurrentIndex - width >= 0 &&
+          !squares[pacmanCurrentIndex -width].classList.contains('wall') &&
+          !squares[pacmanCurrentIndex -width].classList.contains('ghost-lair')
+        )
+          pacmanCurrentIndex -= width
+      } else if(pacManDirection == "down") {
         if (
           pacmanCurrentIndex + width < width * width &&
           !squares[pacmanCurrentIndex +width].classList.contains('wall') &&
           !squares[pacmanCurrentIndex +width].classList.contains('ghost-lair')
         )
-        pacmanCurrentIndex += width
-        break
-    }
+          pacmanCurrentIndex += width
+      } else {
+
+      }
+
     squares[pacmanCurrentIndex].classList.add('pac-man')
     pacDotEaten()
     powerPelletEaten()
     checkForGameOver()
     checkForWin()
   }
-  document.addEventListener('keyup', movePacman)
+
+  setInterval(function(){movePacman()}, 150);
+
+  var keysDown = {};
+  document.addEventListener('keydown', function(e) {
+    keysDown[e.keyCode] = true;
+
+    switch(e.keyCode) {
+      case 37:  //left
+        if(pacmanCurrentIndex % width !== 0 &&
+           !squares[pacmanCurrentIndex -1].classList.contains('wall') &&
+            !squares[pacmanCurrentIndex -1].classList.contains('ghost-lair')
+        )
+          pacManDirection = "left";
+        break
+      case 39: //right
+        if(
+          pacmanCurrentIndex % width < width - 1 &&
+          !squares[pacmanCurrentIndex +1].classList.contains('wall') &&
+          !squares[pacmanCurrentIndex +1].classList.contains('ghost-lair')
+        )
+          pacManDirection = "right";
+        break
+      case 38:  //up
+        if(
+          pacmanCurrentIndex - width >= 0 &&
+          !squares[pacmanCurrentIndex -width].classList.contains('wall') &&
+          !squares[pacmanCurrentIndex -width].classList.contains('ghost-lair')
+        )
+          pacManDirection = "up";
+        break
+      case 40:  //down
+        if (
+          pacmanCurrentIndex + width < width * width &&
+          !squares[pacmanCurrentIndex +width].classList.contains('wall') &&
+          !squares[pacmanCurrentIndex +width].classList.contains('ghost-lair')
+        )
+          pacManDirection = "down";
+        break
+    }
+  });
+
+  document.addEventListener('keyup', function(e) {
+    delete keysDown[e.keyCode];
+  });
 
   // what happens when you eat a pac-dot
   function pacDotEaten() {
